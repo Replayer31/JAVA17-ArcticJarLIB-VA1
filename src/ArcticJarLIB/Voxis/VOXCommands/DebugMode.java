@@ -1,0 +1,57 @@
+package ArcticJarLIB.Voxis.VOXCommands;
+
+import ArcticJarLIB.App.App;
+import ArcticJarLIB.Exceptions.VOXSystemCommandInvalidArgs;
+import ArcticJarLIB.Exceptions.VOXSystemErrorsRoot;
+import ArcticJarLIB.Voxis.VOXCommand;
+import ArcticJarLIB.Voxis.VOXSource;
+import ArcticJarLIB.Voxis.VOXSystem;
+
+import java.util.LinkedHashMap;
+
+public class DebugMode implements VOXCommand<Void, Object> {
+
+    @Override
+    public boolean isCheat() {
+        return false;
+    }
+
+    @Override
+    public VOXSource getPermission() {
+        return VOXSource.NONAME;
+    }
+
+    @Override
+    public String getName() {
+        return "vox_debug";
+    }
+
+    @Override
+    public String toString(Object[] args) {
+        return "VOXCommand \"vox_debug\" that toggles the cheats boolean variable of VOXSystem.";
+    }
+
+    @Override
+    public Void runCommand(VOXSource source, LinkedHashMap<String, Object> registry, String[] packages, Object byWho, VOXSystem VOX, App App, Object[] args) {
+
+        try {
+
+            if (args == null || args.length == 0) {
+                VOX.setDebugStatus(!VOX.getDebugStatus());
+                return null;
+            }
+
+            if (args[0] instanceof Integer intArg0) {
+                boolean Tb = intArg0 != 0;
+                VOX.setDebugStatus(Tb);
+            } else {throw new VOXSystemCommandInvalidArgs();}
+
+        } catch (VOXSystemErrorsRoot e) {
+            System.out.println(e);
+            throw new VOXSystemErrorsRoot(e.toString());
+        }
+
+        return null;
+
+    }
+}
