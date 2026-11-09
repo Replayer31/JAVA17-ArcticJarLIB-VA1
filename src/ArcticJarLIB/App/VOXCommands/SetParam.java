@@ -5,6 +5,8 @@ import ArcticJarLIB.App.CFGManager;
 import ArcticJarLIB.App.CFGParam;
 import ArcticJarLIB.Exceptions.VOXSystemCommandInvalidArgs;
 import ArcticJarLIB.Voxis.VOXCommand;
+import ArcticJarLIB.Voxis.VOXCommandArgs.TextArg;
+import ArcticJarLIB.Voxis.VOXCommandArgument;
 import ArcticJarLIB.Voxis.VOXSource;
 import ArcticJarLIB.Voxis.VOXSystem;
 
@@ -28,37 +30,37 @@ public class SetParam implements VOXCommand {
     }
 
     @Override
-    public String toString(Object[] args) {
+    public String toString(VOXCommandArgument[] args) {
         return "CFGCommand \"cfg_set\" that setts your command value.";
     }
 
     @Override
-    public Object runCommand(VOXSource source, LinkedHashMap registry, String[] packages, Object byWho, VOXSystem VOX, App App, Object[] args) throws RuntimeException {
+    public Object runCommand(VOXSource source, LinkedHashMap registry, String[] packages, Object byWho, VOXSystem VOX, App App, VOXCommandArgument[] args) throws RuntimeException {
 
-        if (args == null || args.length < 1 || !(args[0] instanceof String || args[0] instanceof CFGParam || args[2] instanceof CFGManager) || registry == null) {
+        if (args == null || args.length < 1 || !(args[0] instanceof TextArg || args[0].getType() instanceof CFGParam || args[2].getType() instanceof CFGManager) || registry == null) {
             throw new VOXSystemCommandInvalidArgs();
         }
-        if (!(args[0] instanceof CFGParam) && !(args[2] instanceof CFGManager)) {
+        if (!(args[0].getType() instanceof CFGParam) && !(args[2].getType() instanceof CFGManager)) {
             throw new VOXSystemCommandInvalidArgs();
         }
 
-        if (!(args[0] instanceof CFGParam)) {
+        if (!(args[0].getType() instanceof CFGParam)) {
             if (!registry.isEmpty() && registry.get(args[0]) != null) {
                 return null;
             }
         }
 
-        CFGManager cfgManager = (CFGManager) args[2];
-        if (args[0] instanceof String) {
+        CFGManager cfgManager = (CFGManager) args[2].getValue();
+        if (args[0] instanceof TextArg) {
 
-            CFGParam target = cfgManager.getParam((String) args[0]);
-            cfgManager.setParam(target, args[1]);
+            CFGParam target = cfgManager.getParam((String) args[0].getValue());
+            cfgManager.setParam(target, args[1].getValue());
             return target;
 
         } else {
 
-            CFGParam target = (CFGParam) args[0];
-            cfgManager.setParam(target, args[1]);
+            CFGParam target = (CFGParam) args[0].getValue();
+            cfgManager.setParam(target, args[1].getValue());
             return target;
 
         }

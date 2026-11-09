@@ -4,14 +4,16 @@ import ArcticJarLIB.AJSystem;
 import ArcticJarLIB.Exceptions.*;
 import ArcticJarLIB.App.*;
 import ArcticJarLIB.SystemContainer;
+import ArcticJarLIB.Voxis.VOXCommandArgs.*;
 import ArcticJarLIB.Voxis.VOXCommands.VOXRegister;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.lang.reflect.Constructor;
+
+import static ArcticJarLIB.SystemContainer.Target.VOX;
 
 public class VOXSystem extends AJSystem {
 
@@ -40,7 +42,7 @@ public class VOXSystem extends AJSystem {
         this.setLogMaxSize(VOXLogMaxSize);
         this.container = container;
         this.app = (App) container.get(SystemContainer.Target.APP).orElse(null);
-        container.add(this);
+        container.add(VOX, this);
     }
 
     /**
@@ -59,7 +61,7 @@ public class VOXSystem extends AJSystem {
             String argsPart = Pattern.compile(" ").splitAsStream(input.trim())
                     .skip(1).collect(Collectors.joining(" ")).lines().collect(Collectors.joining(""));
 
-            Object[] args = Pattern.compile(" ")
+            VOXCommandArgument[] args = Pattern.compile(" ")
                     .splitAsStream(argsPart)
                     .filter(s -> !s.isBlank())
                     .map(s -> {
@@ -69,7 +71,7 @@ public class VOXSystem extends AJSystem {
                             throw new RuntimeException(e);
                         }
                     })
-                    .toArray();
+                    .toArray(VOXCommandArgument[]::new);
 
             return run(source, registry, commandsPackages, byWho, commandObject, args);
         } catch (Exception e) {
@@ -78,12 +80,27 @@ public class VOXSystem extends AJSystem {
         return Optional.empty();
     }
 
-    private Object parseAuto(String valueInput, String[] commandsPackages) throws IOException {
+    private VOXCommandArgument parseAuto(String valueInput, String[] commandsPackages) throws IOException {
+        try {
+
+            //тут будет новыя версия кода типо
+
+
+            this.log("parseAuto() don`t found anything to return; Activation oldParseAuto()", true);
+            return oldParseAuto(valueInput, commandsPackages);
+        } catch (Exception e) {
+            this.log("parseAuto() get java error; Activation oldParseAuto()", true);
+            return oldParseAuto(valueInput, commandsPackages);
+        }
+    }
+
+
+    private VOXCommandArgument oldParseAuto(String valueInput, String[] commandsPackages) throws IOException {
 
         if (valueInput.startsWith("<IGNORE>")) {
             valueInput = valueInput.replaceFirst("<IGNORE>", "");
             log("parseAuto() command argument " + valueInput + " has been ignored", true);
-            return valueInput;
+            return new TextArg(valueInput);
         }
 
 
@@ -97,7 +114,7 @@ public class VOXSystem extends AJSystem {
                 valueInput = valueInput.replaceFirst("<int>", "");
                 int target = Integer.parseInt(valueInput);
                 log("parseAuto() returns int", true);
-                return target;
+                return new IntArg(target);
             }
         } catch (NumberFormatException ignored) {  }
 
@@ -170,11 +187,11 @@ public class VOXSystem extends AJSystem {
                     value = Class.forName(getClazz).getDeclaredConstructor().newInstance();
 
                     log("parseAuto() returns \"" + value + "\" as " + value.getClass().getName(), true);
-                    return value;
+                    return new ObjArg(value);
                 }
 
                 log("parseAuto() returns \"" + value + "\" as " + value.getClass().getName(), true);
-                return value;
+                return new ObjArg(value);
 
             } catch (Exception e) {
                 log("Failed to parse argument \"" + valueInput + "\": " + e.getMessage(), true);
@@ -182,7 +199,7 @@ public class VOXSystem extends AJSystem {
                         .splitAsStream(valueInput.replaceAll("<", "").replaceAll(">", ""))
                         .skip(2).collect(Collectors.joining("."));
                 log("parseAuto() returns \"" + retVar + "\" as String", true);
-                return retVar; }
+                return new ObjArg(value); }
         }
 
         if (value.toString().startsWith("<")) {
@@ -223,45 +240,45 @@ public class VOXSystem extends AJSystem {
 
                             Class<Enum> enumClass = (Class<Enum>) clazz;
                             log("parseAuto() returns " + Enum.valueOf(enumClass, enumValName).getClass().getName(), true);
-                            return Enum.valueOf(enumClass, enumValName);
+                            return new ObjArg(Enum.valueOf(enumClass, enumValName));
                         }
 
                         if (List.class.isAssignableFrom(clazz)) {
                             log("parseAuto() returns " + parsedArgs.getClass().getName(), true);
-                            return parsedArgs;
+                            return new ObjArg(parsedArgs);
                         }
                     }
                 } catch (Exception ignored) {}
 
                 if (parsedArgs.size() == 1) {
                     log("parseAuto() returns " + parsedArgs.get(0).getClass().getName(), true);
-                    return parsedArgs.get(0);
+                    return new ObjArg(parsedArgs.get(0));
                 }
                 log("parseAuto() returns " + parsedArgs.getClass().getName(), true);
-                return parsedArgs;
+                return new ObjArg(parsedArgs);
             }
         }
 
         if (valueInput.startsWith("VOXCommand.")) {
             log("parseAuto() returns VOXCommand", true);
-            return parseVOXCommand(valueInput.replace("VOXCommand.", ""), commandsPackages).orElse(null);
+            return new VOXCommandArg(parseVOXCommand(valueInput.replace("VOXCommand.", ""), commandsPackages).orElse(null));
         }
 
         if ("true".equalsIgnoreCase(valueInput) || "false".equalsIgnoreCase(valueInput)) {
             log("parseAuto() returns Boolean", true);
-            return Boolean.parseBoolean(valueInput);
+            return new BooleanArg(Boolean.parseBoolean(valueInput));
         }
 
         try {
-            return Integer.parseInt(valueInput);
+            return new IntArg(Integer.parseInt(valueInput));
         } catch (NumberFormatException ignored) {  }
 
         try {
-            return Double.parseDouble(valueInput);
+            return new DoubleArg(Double.parseDouble(valueInput));
         } catch (NumberFormatException ignored) {  }
 
         log("parseAuto() returns String: " + value, true);
-        return value;
+        return new TextArg(String.valueOf(value));
     }
 
     private Optional<VOXCommand> parseVOXCommand(String cmdName, String[] commandsPackages) throws IOException {
@@ -276,7 +293,7 @@ public class VOXSystem extends AJSystem {
                 if (VOXCommand.class.isAssignableFrom(clazz)) {
                     Constructor<?> constructor = clazz.getDeclaredConstructor();
                     constructor.setAccessible(true);
-                    VOXCommand<?, ?> instance = (VOXCommand<?, ?>) constructor.newInstance();
+                    VOXCommand<?> instance = (VOXCommand<?>) constructor.newInstance();
                     return Optional.of(instance);
                 }
             } catch (ClassNotFoundException ignored) {}
@@ -298,7 +315,7 @@ public class VOXSystem extends AJSystem {
      * @param args Command object arguments
      * @return Optional containing command result if present, empty Optional otherwise
      */
-    public <A> Optional<Object> run(VOXSource source, LinkedHashMap<String, Object> registry, String[] commandsPackages, Object byWho, String commandObject, A[] args)
+    public Optional<Object> run(VOXSource source, LinkedHashMap<String, Object> registry, String[] commandsPackages, Object byWho, String commandObject, VOXCommandArgument[] args)
 
             throws VOXSystemErrorsRoot, VOXSystemInvalidInput, VOXSystemInsufficientPermissions, VOXSystemCommandIsInvalid
             , VOXSystemCommandNotExists, VOXSystemObjectIsNotCommand, VOXSystemCheatCommandIsNotAllowed, IOException {
@@ -313,14 +330,14 @@ public class VOXSystem extends AJSystem {
                     if (command == null) {
                         throw new VOXSystemCommandIsInvalid();
                     }
-                    if (command instanceof VOXCommand<?, ?> commandTarget) {
+                    if (command instanceof VOXCommand<?> commandTarget) {
 
                         if (commandTarget.isCheat() && !isCheatsAllowed() && source != VOXSource.PROGRAM) {
                             throw new VOXSystemCheatCommandIsNotAllowed();
                         }
 
                         @SuppressWarnings("unchecked")
-                        VOXCommand<?, A> typedCommand = (VOXCommand<?, A>) commandTarget;
+                        VOXCommand<?> typedCommand = (VOXCommand<?>) commandTarget;
 
                         boolean isSourceHavePermission;
                         if (source != VOXSource.PROGRAM) {

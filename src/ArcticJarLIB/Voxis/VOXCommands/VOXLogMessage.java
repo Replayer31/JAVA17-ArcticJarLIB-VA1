@@ -3,6 +3,8 @@ package ArcticJarLIB.Voxis.VOXCommands;
 import ArcticJarLIB.App.App;
 import ArcticJarLIB.Exceptions.VOXSystemCommandInvalidArgs;
 import ArcticJarLIB.Voxis.VOXCommand;
+import ArcticJarLIB.Voxis.VOXCommandArgs.TextArg;
+import ArcticJarLIB.Voxis.VOXCommandArgument;
 import ArcticJarLIB.Voxis.VOXSource;
 import ArcticJarLIB.Voxis.VOXSystem;
 
@@ -27,16 +29,16 @@ public class VOXLogMessage implements VOXCommand {
     }
 
     @Override
-    public String toString(Object[] args) {
+    public String toString(VOXCommandArgument[] args) {
         return "VOXCommand \"vox_LogMessage\" that print`s an message in VOXSystem log.";
     }
 
     @Override
-    public Void runCommand(VOXSource source, LinkedHashMap registry,String[] packages, Object byWho, VOXSystem VOX, App App, Object[] args) throws RuntimeException, IOException {
-        if (args == null || args.length < 1 || !(args[0] instanceof String) || byWho == null) {
+    public Void runCommand(VOXSource source, LinkedHashMap registry,String[] packages, Object byWho, VOXSystem VOX, App App, VOXCommandArgument[] args) throws RuntimeException, IOException {
+        if (args == null || args.length < 1 || !(args[0] instanceof TextArg) || byWho == null) {
             throw new VOXSystemCommandInvalidArgs();
         } else {
-            VOX.log(args[0].toString(), false);
+            VOX.log(((TextArg) args[0]).getValue(), false);
             VOX.log(getName() + " by " + byWho.getClass().getSimpleName() + ": " + args[0], true);
         }
         return null;

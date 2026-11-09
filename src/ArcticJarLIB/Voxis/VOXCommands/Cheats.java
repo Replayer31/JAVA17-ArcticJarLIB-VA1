@@ -4,12 +4,13 @@ import ArcticJarLIB.App.App;
 import ArcticJarLIB.Exceptions.VOXSystemCommandInvalidArgs;
 import ArcticJarLIB.Exceptions.VOXSystemErrorsRoot;
 import ArcticJarLIB.Voxis.VOXCommand;
+import ArcticJarLIB.Voxis.VOXCommandArgument;
 import ArcticJarLIB.Voxis.VOXSource;
 import ArcticJarLIB.Voxis.VOXSystem;
 
 import java.util.LinkedHashMap;
 
-public class Cheats implements VOXCommand<Void, Object> {
+public class Cheats implements VOXCommand<Void> {
 
     @Override
     public boolean isCheat() {
@@ -27,12 +28,12 @@ public class Cheats implements VOXCommand<Void, Object> {
     }
 
     @Override
-    public String toString(Object[] args) {
+    public String toString(VOXCommandArgument[] args) {
         return "VOXCommand \"vox_cheats\" that toggles the cheats boolean variable of VOXSystem.";
     }
 
     @Override
-    public Void runCommand(VOXSource source, LinkedHashMap<String, Object> registry, String[] packages, Object byWho, VOXSystem VOX, App App, Object[] args) {
+    public Void runCommand(VOXSource source, LinkedHashMap<String, Object> registry, String[] packages, Object byWho, VOXSystem VOX, App App, VOXCommandArgument[] args) {
 
         try {
 
@@ -42,13 +43,18 @@ public class Cheats implements VOXCommand<Void, Object> {
             }
 
 
-            if (!(args[0] instanceof Integer) || args.length >= 1) {
+            if (!(args[0].getType() instanceof Integer) || args.length >= 1) {
                 throw new VOXSystemCommandInvalidArgs();
             }
 
 
-            if (args[0] instanceof Integer intArg0) {
+            if (args[0].getType() instanceof Integer intArg0) {
                 boolean Tb = intArg0 != 0;
+                VOX.setCheats(Tb, source);
+            }
+
+            if (args[0].getType() instanceof Boolean booleanArg0) {
+                boolean Tb = booleanArg0;
                 VOX.setCheats(Tb, source);
             }
 

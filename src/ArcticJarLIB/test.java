@@ -40,7 +40,7 @@ public class test {
         Object[] regArray = VOXFile.runAssetVOXFile(VOXSource.PROGRAM, VOXRegistry, commandsPackets,  VOX, container, "Scripts/RegisterAll.VOX");
 
 
-        VOX.run(VOXSource.PROGRAM, VOXRegistry, commandsPackets,  VOX, "vox_debug 1");
+        VOX.run(VOXSource.PROGRAM, VOXRegistry, commandsPackets,  VOX, "vox_debug <int>1");
 
         VOXFile.runAssetVOXFile(VOXSource.PROGRAM, VOXRegistry, commandsPackets,  VOX, container, "Scripts/RegisterAll.VOX");
 

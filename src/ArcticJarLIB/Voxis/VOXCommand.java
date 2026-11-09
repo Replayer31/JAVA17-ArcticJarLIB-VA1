@@ -8,9 +8,8 @@ import java.util.LinkedHashMap;
 /**
  * VOXSystem Command interface
  * @param <R> What command returns?; You can write "Void" here
- * @param <A> What arguments command need?; You can ignore them
  */
-public interface VOXCommand<R, A> {
+public interface VOXCommand<R> {
 
     /**
      * Is VOXSystem Command need cheats to run()?
@@ -30,7 +29,7 @@ public interface VOXCommand<R, A> {
     /**
      * Describe your command/Return name of your command/What if convert your command to string?
      */
-    String toString(A[] args);
+    String toString(VOXCommandArgument[] args);
 
 
     /**
@@ -43,7 +42,7 @@ public interface VOXCommand<R, A> {
      * @param App      App object
      * @param args     VOXSystem Command arguments, <b>DO ONLY "OBJECT"</b>
      */
-    R runCommand(VOXSource source, LinkedHashMap<String, Object> registry, String[] packages, Object byWho, VOXSystem VOX, App App, A[] args)
+    R runCommand(VOXSource source, LinkedHashMap<String, Object> registry, String[] packages, Object byWho, VOXSystem VOX, App App, VOXCommandArgument[] args)
             throws RuntimeException, IOException;
 
     /**

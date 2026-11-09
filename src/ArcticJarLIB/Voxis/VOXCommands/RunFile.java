@@ -2,16 +2,15 @@ package ArcticJarLIB.Voxis.VOXCommands;
 
 import ArcticJarLIB.App.App;
 import ArcticJarLIB.Exceptions.VOXSystemCommandInvalidArgs;
-import ArcticJarLIB.Voxis.VOXCommand;
-import ArcticJarLIB.Voxis.VOXFile;
-import ArcticJarLIB.Voxis.VOXSource;
-import ArcticJarLIB.Voxis.VOXSystem;
+import ArcticJarLIB.Voxis.*;
+import ArcticJarLIB.Voxis.VOXCommandArgs.PathArg;
+import ArcticJarLIB.Voxis.VOXCommandArgs.TextArg;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
-public class RunFile implements VOXCommand<Object[], Object> {
+public class RunFile implements VOXCommand<Object[]> {
 
     @Override
     public boolean isCheat() {
@@ -29,23 +28,25 @@ public class RunFile implements VOXCommand<Object[], Object> {
     }
 
     @Override
-    public String toString(Object[] args) {
+    public String toString(VOXCommandArgument[] args) {
         return "VOXCommand \"vox_runFile\" that runs the VOXFile";
     }
 
     @Override
     public Object[] runCommand(VOXSource source, LinkedHashMap<String, Object> registry, String[] packages, Object byWho, VOXSystem VOX, App App,
-                               Object[] args) throws IOException {
+                               VOXCommandArgument[] args) throws IOException {
         try {
             if (args == null || args.length == 0 || args[0] == null) {
                 throw new VOXSystemCommandInvalidArgs();
             }
 
             Path path;
-            if (args[0] instanceof Path p) {
-                path = p;
+            if (!(args[0] instanceof TextArg) || !(args[0] instanceof PathArg)) {
+                throw new VOXSystemCommandInvalidArgs();
+            } else if (args[0] instanceof PathArg) {
+                path = (Path) args[0].getValue();
             } else {
-                path = Path.of(args[0].toString());
+                path = Path.of(String.valueOf(args[0].getValue()));
             }
 
             return VOXFile.runVOXFile(source, registry, packages, byWho, VOX, path);

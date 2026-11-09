@@ -38,7 +38,7 @@ public class CFGManager extends AJSystem {
         Path appPath = Path.of(this.app.get(PATHSTRING).toString());
         this.cfgPath = appPath.resolve("settings.cfg");
         this.cfgList = cfgList;
-        container.add(this);
+        container.add(SystemContainer.Target.CFG, this);
         log("Created", true);
     }
 

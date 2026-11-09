@@ -1,16 +1,18 @@
-//REGISTER VOXRegister COMMAND BEFOREHAND;
-//VOXCommands;
-vox_register VOXCommand.Cheats;
-vox_register VOXCommand.Run; vox_register VOXCommand.RunFile;
-vox_register VOXCommand.VOXLogMessage;
-vox_register VOXCommand.DebugMode;
+//REGISTER VOXRegister COMMAND BEFOREHAND
+//VOXCommands
+vox_register VOXCommand.Cheats
+vox_register VOXCommand.Run
+vox_register VOXCommand.RunFile
+vox_register VOXCommand.VOXLogMessage
+vox_register VOXCommand.DebugMode
 
-//System commands;
-vox_register VOXCommand.NewObj;
-vox_register VOXCommand.Return;
-vox_register VOXCommand.PrintJARConsole;
-vox_register VOXCommand.PrintlnJARConsole;
+//System commands
+vox_register VOXCommand.NewObj
+vox_register VOXCommand.Return
+vox_register VOXCommand.PrintJARConsole
+vox_register VOXCommand.PrintlnJARConsole
+vox_register VOXCommand.DebugMode
 
-//CFGCommands;
-vox_register VOXCommand.AddParam;
-vox_register VOXCommand.SetParam;
+//CFGCommands
+vox_register VOXCommand.AddParam
+vox_register VOXCommand.SetParam

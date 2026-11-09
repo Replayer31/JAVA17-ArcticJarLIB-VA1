@@ -4,14 +4,17 @@ import ArcticJarLIB.App.App;
 import ArcticJarLIB.Exceptions.VOXSystemCommandInvalidArgs;
 import ArcticJarLIB.Exceptions.VOXSystemErrorsRoot;
 import ArcticJarLIB.Voxis.VOXCommand;
+import ArcticJarLIB.Voxis.VOXCommandArgument;
 import ArcticJarLIB.Voxis.VOXSource;
 import ArcticJarLIB.Voxis.VOXSystem;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
-public class NewObj implements VOXCommand<Object, Object> {
+public class NewObj implements VOXCommand<Object> {
     @Override
     public boolean isCheat() {
         return true;
@@ -28,22 +31,30 @@ public class NewObj implements VOXCommand<Object, Object> {
     }
 
     @Override
-    public String toString(Object[] args) {
+    public String toString(VOXCommandArgument[] args) {
         return "System command \"sys_NewObj\" that creates and returns an target object.";
     }
 
     @Override
-    public Object runCommand(VOXSource source, LinkedHashMap<String, Object> registry,String[] packages, Object byWho, VOXSystem VOX, App App, Object[] args) throws VOXSystemCommandInvalidArgs, VOXSystemErrorsRoot {
+    public Object runCommand(VOXSource source, LinkedHashMap<String, Object> registry,String[] packages, Object byWho, VOXSystem VOX, App App, VOXCommandArgument[] args) throws VOXSystemCommandInvalidArgs, VOXSystemErrorsRoot {
 
         if (args == null) { throw new VOXSystemCommandInvalidArgs("Some args is null"); }
 
-        Object first = Arrays.stream(args)
+        List<Object> trueArgs = new ArrayList<>();
+        for (VOXCommandArgument arg : args) {
+            trueArgs.add(arg.getValue());
+        }
+
+        Object[] trueArgsArray = trueArgs.toArray();
+
+
+        Object first = Arrays.stream(trueArgsArray)
                 .findFirst()
                 .orElse(null);
 
         if (first == null) { throw new VOXSystemCommandInvalidArgs(".findFirst() Stream API method don`t returned first arg"); }
 
-        Object[] rest = Arrays.stream(args)
+        Object[] rest = Arrays.stream(trueArgsArray)
                 .skip(1)
                 .toArray(Object[]::new);
 

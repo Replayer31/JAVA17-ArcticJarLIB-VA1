@@ -3,10 +3,13 @@ package ArcticJarLIB.VOXCommands;
 import ArcticJarLIB.App.App;
 import ArcticJarLIB.Exceptions.VOXSystemCommandInvalidArgs;
 import ArcticJarLIB.Voxis.VOXCommand;
+import ArcticJarLIB.Voxis.VOXCommandArgument;
 import ArcticJarLIB.Voxis.VOXSource;
 import ArcticJarLIB.Voxis.VOXSystem;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class Return implements VOXCommand {
     @Override
@@ -25,20 +28,28 @@ public class Return implements VOXCommand {
     }
 
     @Override
-    public String toString(Object[] args) {
+    public String toString(VOXCommandArgument[] args) {
         return "System command \"sys_return\" that returns an target object.";
     }
 
     @Override
-    public Object runCommand(VOXSource source, LinkedHashMap registry, String[] packages, Object byWho, VOXSystem VOX, App App, Object[] args)
+    public Object runCommand(VOXSource source, LinkedHashMap registry, String[] packages, Object byWho, VOXSystem VOX, App App, VOXCommandArgument[] args)
             throws RuntimeException {
         for (Object obj : args) { if (obj == null) { throw new VOXSystemCommandInvalidArgs("Some args is null"); } }
         if (args.length < 2) {
-            return VOX.setLastReturned(args[0]);
+            return VOX.setLastReturned(args[0].getValue());
         } else {
             try {
 
-                String joinedArgs = java.util.Arrays.stream(args)
+                List<Object> trueArgs = new ArrayList<>();
+
+                for (VOXCommandArgument arg : args) {
+                    trueArgs.add(arg.getValue());
+                }
+
+                Object[] trueArgsArray = trueArgs.toArray();
+
+                String joinedArgs = java.util.Arrays.stream(trueArgsArray)
                         .map(Object::toString)
                         .collect(java.util.stream.Collectors.joining(" "));
 

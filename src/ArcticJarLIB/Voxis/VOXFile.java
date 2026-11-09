@@ -42,7 +42,7 @@ public class VOXFile {
             throw new VOXFileNotExists();
         }
 
-        String[] code = Pattern.compile(";").splitAsStream(Files.readString(path))
+        String[] code = Pattern.compile("\n").splitAsStream(Files.readString(path))
                 .filter(s -> !s.isBlank())
                 .toArray(String[]::new);
 
@@ -83,8 +83,9 @@ public class VOXFile {
         AssetsReader targetReader = new AssetsReader(path, container);
 
         String[] code = Arrays.stream(targetReader.readFromRoot().orElse(null))
-                .collect(Collectors.joining())
-                .split(";");
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.joining("\n"))
+                .split("\n");
 
         Object[] results = new Object[code.length];
 
@@ -159,7 +160,7 @@ public class VOXFile {
         }
 
         vox.log("Exported VOXFile content to: " + path, false);
-        return Pattern.compile("(?<=;)")
+        return Pattern.compile("\n")
                 .splitAsStream(Files.readString(path))
                 .map(String::trim)
                 .filter(s -> !s.isBlank())

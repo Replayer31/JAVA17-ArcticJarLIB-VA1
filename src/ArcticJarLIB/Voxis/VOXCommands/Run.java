@@ -2,16 +2,14 @@ package ArcticJarLIB.Voxis.VOXCommands;
 
 import ArcticJarLIB.App.App;
 import ArcticJarLIB.Exceptions.VOXSystemCommandInvalidArgs;
-import ArcticJarLIB.Voxis.VOXCommand;
-import ArcticJarLIB.Voxis.VOXFile;
-import ArcticJarLIB.Voxis.VOXSource;
-import ArcticJarLIB.Voxis.VOXSystem;
+import ArcticJarLIB.Voxis.*;
+import ArcticJarLIB.Voxis.VOXCommandArgs.TextArg;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
-public class Run implements VOXCommand<Object[], Object> {
+public class Run implements VOXCommand<Object[]> {
 
     @Override
     public boolean isCheat() {
@@ -29,23 +27,27 @@ public class Run implements VOXCommand<Object[], Object> {
     }
 
     @Override
-    public String toString(Object[] args) {
+    public String toString(VOXCommandArgument[] args) {
         return "VOXCommand \"vox_run\" that runs the entered command";
     }
 
     @Override
     public Object[] runCommand(VOXSource source, LinkedHashMap<String, Object> registry, String[] packages, Object byWho, VOXSystem VOX, App App,
-                               Object[] args) throws IOException {
+                               VOXCommandArgument[] args) throws IOException {
         try {
             if (args == null || args.length == 0 || args[0] == null) {
                 throw new VOXSystemCommandInvalidArgs();
             }
-
-            String target = (String) args[0];
-            return new Object[]{VOX.run(source, registry, packages, byWho, target).orElse(null)};
+            if (!(args[0] instanceof TextArg)) {
+                throw new VOXSystemCommandInvalidArgs();
+            } else {
+                TextArg textArg = (TextArg) args[0];
+                String target = textArg.getValue();
+                return new Object[]{VOX.run(source, registry, packages, byWho, target).orElse(null)};
+            }
 
         } catch (Exception e) {
-            VOX.log("Error when running VOXFile by \"vox_run\" VOXCommand: " + e.getMessage(), true);
+            VOX.log("Error when running VOXCommand by \"vox_run\" VOXCommand: " + e.getMessage(), true);
         }
         return null;
     }
